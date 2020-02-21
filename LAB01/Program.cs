@@ -19,7 +19,7 @@ namespace LAB01
         {
             SetupConsoleColors();
 
-            Main application = new Main("Remeika Aurėjus IFZ-8/2", 1);
+            Main application = new Main();
             application.startApplication();
         }
 

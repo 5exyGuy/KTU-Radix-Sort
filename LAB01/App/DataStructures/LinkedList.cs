@@ -23,6 +23,14 @@ namespace LAB01.App.Data_Structures
             public Node Head { private set; get; }
             public Node Tail { private set; get; }
             public int Count { private set; get; }
+            public int OperationCount { private set; get; }
+
+            public Memory() { }
+
+            public void ResetOperationCount()
+            {
+                OperationCount = 0;
+            }
 
             public void Generate(int n)
             {
@@ -59,7 +67,10 @@ namespace LAB01.App.Data_Structures
                 for (int exp = 1; m / exp > 0; exp *= 10)
                 {
                     CountSort(exp);
+                    OperationCount += 2;
                 }
+
+                OperationCount += 2;
             }
 
             private int GetMax()
@@ -71,8 +82,13 @@ namespace LAB01.App.Data_Structures
                     if (node.Data > mx)
                     {
                         mx = node.Data;
+                        OperationCount++;
                     }
+
+                    OperationCount += 2;
                 }
+
+                OperationCount += 3;
 
                 return mx;
             }
@@ -80,34 +96,40 @@ namespace LAB01.App.Data_Structures
             private void CountSort(int exp)
             {
                 int[] output = new int[Count];
-                int i;
                 int[] count = new int[10];
 
-                for (i = 0; i < 10; i++)
+                for (int i = 0; i < 10; i++)
                 {
                     count[i] = 0;
+                    OperationCount += 2;
                 }
 
                 for (Node node = Head; node != null; node = node.Next)
                 {
                     count[(node.Data / exp) % 10]++;
+                    OperationCount += 2;
                 }
 
-                for (i = 1; i < 10; i++)
+                for (int i = 1; i < 10; i++)
                 {
                     count[i] += count[i - 1];
+                    OperationCount += 2;
                 }
 
                 for (Node node = Tail; node != null; node = node.Prev)
                 {
                     output[count[(node.Data / exp) % 10] - 1] = node.Data;
                     count[(node.Data / exp) % 10]--;
+                    OperationCount += 3;
                 }
 
                 for (Node node = Head; node != null; node = node.Next)
                 {
                     node.Data = output[node.Index];
+                    OperationCount += 2;
                 }
+
+                OperationCount += 7;
             }
 
             public void Print()
@@ -128,48 +150,50 @@ namespace LAB01.App.Data_Structures
             public int Index { private set; get; }
             public int NextNode { private set; get; }
             public int PrevNode { private set; get; }
+            public int OperationCount { private set; get; }
 
             public Disk(string fileName)
             {
                 FileName = fileName;
             }
 
+            public void ResetOperationCount()
+            {
+                OperationCount = 0;
+            }
+
             public int Head()
             {
                 Byte[] data = new Byte[12];
                 Index = 0;
-                // Previous Node Data
                 FileStream.Seek(Index, SeekOrigin.Begin);
-                FileStream.Read(data, 0, 4);
+                FileStream.Read(data, 0, 12);
+                // Previous Node Data
                 PrevNode = BitConverter.ToInt32(data, 0);
                 // Current Node Data
-                FileStream.Seek(Index + 4, SeekOrigin.Begin);
-                FileStream.Read(data, 0, 8);
-                CurrentNode = BitConverter.ToInt32(data, 0);
+                CurrentNode = BitConverter.ToInt32(data, 4);
                 // Next Node Data
-                FileStream.Seek(Index + 8, SeekOrigin.Begin);
-                FileStream.Read(data, 0, 12);
-                NextNode = BitConverter.ToInt32(data, 0);
+                NextNode = BitConverter.ToInt32(data, 8);
 
+                OperationCount += 8;
+                
                 return CurrentNode;
             }
 
             private int Tail()
             {
                 Byte[] data = new Byte[12];
-                Index = (Count - 1);
-                // Previous Node Data
+                Index = Count - 1;
                 FileStream.Seek(Index * 4, SeekOrigin.Begin);
-                FileStream.Read(data, 0, 4);
+                FileStream.Read(data, 0, 12);
+                // Previous Node Data
                 PrevNode = BitConverter.ToInt32(data, 0);
                 // Current Node Data
-                FileStream.Seek(Index * 4 + 4, SeekOrigin.Begin);
-                FileStream.Read(data, 0, 8);
-                CurrentNode = BitConverter.ToInt32(data, 0);
+                CurrentNode = BitConverter.ToInt32(data, 4);
                 // Next Node Data 
-                FileStream.Seek(Index * 4 + 8, SeekOrigin.Begin);
-                FileStream.Read(data, 0, 12);
-                NextNode = BitConverter.ToInt32(data, 0);
+                NextNode = BitConverter.ToInt32(data, 8);
+
+                OperationCount += 8;
 
                 return CurrentNode;
             }
@@ -178,23 +202,22 @@ namespace LAB01.App.Data_Structures
             {
                 if (NextNode == -1)
                 {
+                    OperationCount += 1;
                     return -1;
                 }
 
                 Byte[] data = new Byte[12];
                 Index++;
-                // Previous Node Data
                 FileStream.Seek(Index * 4, SeekOrigin.Begin);
-                FileStream.Read(data, 0, 4);
+                FileStream.Read(data, 0, 12);
+                // Previous Node Data
                 PrevNode = BitConverter.ToInt32(data, 0);
                 // Current Node Data
-                FileStream.Seek(Index * 4 + 4, SeekOrigin.Begin);
-                FileStream.Read(data, 0, 8);
-                CurrentNode = BitConverter.ToInt32(data, 0);
+                CurrentNode = BitConverter.ToInt32(data, 4);
                 // Next Node Data
-                FileStream.Seek(Index * 4 + 8, SeekOrigin.Begin);
-                FileStream.Read(data, 0, 12);
-                NextNode = BitConverter.ToInt32(data, 0);
+                NextNode = BitConverter.ToInt32(data, 8);
+
+                OperationCount += 9;
 
                 return CurrentNode;
             }
@@ -203,23 +226,22 @@ namespace LAB01.App.Data_Structures
             {
                 if (PrevNode == -1)
                 {
+                    OperationCount++;
                     return -1;
                 }
 
                 Byte[] data = new Byte[12];
                 Index--;
-                // Previous Node Data
                 FileStream.Seek(Index * 4, SeekOrigin.Begin);
-                FileStream.Read(data, 0, 4);
+                FileStream.Read(data, 0, 12);
+                // Previous Node Data
                 PrevNode = BitConverter.ToInt32(data, 0);
                 // Current Node Data
-                FileStream.Seek(Index * 4 + 4, SeekOrigin.Begin);
-                FileStream.Read(data, 0, 8);
-                CurrentNode = BitConverter.ToInt32(data, 0);
+                CurrentNode = BitConverter.ToInt32(data, 4);
                 // Next Node Data
-                FileStream.Seek(Index * 4 + 8, SeekOrigin.Begin);
-                FileStream.Read(data, 0, 12);
-                NextNode = BitConverter.ToInt32(data, 0);
+                NextNode = BitConverter.ToInt32(data, 8);
+
+                OperationCount += 9;
 
                 return CurrentNode;
             }
@@ -230,6 +252,8 @@ namespace LAB01.App.Data_Structures
                 BitConverter.GetBytes(newData).CopyTo(data, 0);
                 FileStream.Seek((Index + 1) * 4, SeekOrigin.Begin);
                 FileStream.Write(data, 0, 4);
+
+                OperationCount += 4;
             }
 
             public void Generate(int n)
@@ -247,7 +271,7 @@ namespace LAB01.App.Data_Structures
                         writer.Write(-1);
                         for (int i = 0; i < n; i++)
                         {
-                            int test = random.Next(10);
+                            int test = random.Next(Int32.MaxValue);
                             writer.Write(test);
                             Count++;
                         }
@@ -267,7 +291,10 @@ namespace LAB01.App.Data_Structures
                 for (int exp = 1; m / exp > 0; exp *= 10)
                 {
                     CountSort(exp);
+                    OperationCount += 2;
                 }
+
+                OperationCount += 2;
             }
 
             private int GetMax()
@@ -279,8 +306,13 @@ namespace LAB01.App.Data_Structures
                     if (Next() > mx)
                     {
                         mx = CurrentNode;
+                        OperationCount++;
                     }
+
+                    OperationCount += 2;
                 }
+
+                OperationCount += 3;
 
                 return mx;
             }
@@ -288,34 +320,40 @@ namespace LAB01.App.Data_Structures
             private void CountSort(int exp)
             {
                 int[] output = new int[Count];
-                int i;
                 int[] count = new int[10];
 
-                for (i = 0; i < 10; i++)
+                for (int i = 0; i < 10; i++)
                 {
                     count[i] = 0;
+                    OperationCount += 2;
                 }
 
                 for (int res = Head(); res != -1 ; res = Next())
                 {
                     count[(res / exp) % 10]++;
+                    OperationCount += 2;
                 }
 
-                for (i = 1; i < 10; i++)
+                for (int i = 1; i < 10; i++)
                 {
                     count[i] += count[i - 1];
+                    OperationCount += 2;
                 }
 
                 for (int res = Tail(); res != -1; res = Prev())
                 {
                     output[count[(res / exp) % 10] - 1] = res;
                     count[(res / exp) % 10]--;
+                    OperationCount += 3;
                 }
 
                 for (int res = Head(); res != -1; res = Next())
                 {
                     Set(output[Index]);
+                    OperationCount += 2;
                 }
+
+                OperationCount += 7;
             }
 
             public void Print()

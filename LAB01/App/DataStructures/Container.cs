@@ -23,8 +23,14 @@ namespace LAB01.App.Data_Structures
             public int Count { get { return Array.Length; } }
             public int[] Array { private set; get; }
             public int this[int i] { get { return Array[i]; } }
+            public int OperationCount { private set; get; }
 
             public Memory() { }
+
+            public void ResetOperationCount()
+            {
+                OperationCount = 0;
+            }
 
             public void Generate(int n)
             {
@@ -44,7 +50,10 @@ namespace LAB01.App.Data_Structures
                 for (int exp = 1; m / exp > 0; exp *= 10)
                 {
                     CountSort(exp);
+                    OperationCount += 2;
                 }
+
+                OperationCount += 2;
             }
 
             private int GetMax()
@@ -56,8 +65,13 @@ namespace LAB01.App.Data_Structures
                     if (Array[i] > mx)
                     {
                         mx = Array[i];
+                        OperationCount++;
                     }
+
+                    OperationCount += 2;
                 }
+
+                OperationCount += 3;
 
                 return mx;
             }
@@ -65,34 +79,40 @@ namespace LAB01.App.Data_Structures
             private void CountSort(int exp)
             {
                 int[] output = new int[Count];
-                int i;
                 int[] count = new int[10];
 
-                for (i = 0; i < 10; i++)
+                for (int i = 0; i < 10; i++)
                 {
                     count[i] = 0;
+                    OperationCount += 2;
                 }
 
-                for (i = 0; i < Count; i++)
+                for (int i = 0; i < Count; i++)
                 {
                     count[(Array[i] / exp) % 10]++;
+                    OperationCount += 2;
                 }
 
-                for (i = 1; i < 10; i++)
+                for (int i = 1; i < 10; i++)
                 {
                     count[i] += count[i - 1];
+                    OperationCount += 2;
                 }
 
-                for (i = Count - 1; i >= 0; i--)
+                for (int i = Count - 1; i >= 0; i--)
                 {
                     output[count[(Array[i] / exp) % 10] - 1] = Array[i];
                     count[(Array[i] / exp) % 10]--;
+                    OperationCount += 3;
                 }
 
-                for (i = 0; i < Count; i++)
+                for (int i = 0; i < Count; i++)
                 {
                     Array[i] = output[i];
+                    OperationCount += 2;
                 }
+
+                OperationCount += 7;
             }
 
             public void Print()
@@ -117,6 +137,7 @@ namespace LAB01.App.Data_Structures
                     FileStream.Seek(4 * index, SeekOrigin.Begin);
                     FileStream.Read(data, 0, 4);
                     int result = BitConverter.ToInt32(data, 0);
+                    OperationCount += 5;
                     return result;
                 }
                 set
@@ -125,12 +146,19 @@ namespace LAB01.App.Data_Structures
                     BitConverter.GetBytes(value).CopyTo(data, 0);
                     FileStream.Seek(4 * index, SeekOrigin.Begin);
                     FileStream.Write(data, 0, 4);
+                    OperationCount += 4;
                 }
             }
+            public int OperationCount { private set; get; }
 
             public Disk(string fileName)
             {
                 FileName = fileName;
+            }
+
+            public void ResetOperationCount()
+            {
+                OperationCount = 0;
             }
 
             public void Generate(int n)
@@ -165,20 +193,28 @@ namespace LAB01.App.Data_Structures
                 for (int exp = 1; m / exp > 0; exp *= 10)
                 {
                     CountSort(exp);
+                    OperationCount += 2;
                 }
+
+                OperationCount += 2;
             }
 
             private int GetMax()
             {
-                int mx = this[0];
+                int mx = this[0]; 
 
                 for (int i = 1; i < Count; i++)
                 {
                     if (this[i] > mx)
                     {
                         mx = this[i];
+                        OperationCount++;
                     }
+
+                    OperationCount += 2;
                 }
+
+                OperationCount += 3;
 
                 return mx;
             }
@@ -186,34 +222,40 @@ namespace LAB01.App.Data_Structures
             private void CountSort(int exp)
             {
                 int[] output = new int[Count];
-                int i;
                 int[] count = new int[10];
 
-                for (i = 0; i < 10; i++)
+                for (int i = 0; i < 10; i++)
                 {
                     count[i] = 0;
+                    OperationCount += 2;
                 }
 
-                for (i = 0; i < Count; i++)
+                for (int i = 0; i < Count; i++)
                 {
                     count[(this[i] / exp) % 10]++;
+                    OperationCount += 2;
                 }
 
-                for (i = 1; i < 10; i++)
+                for (int i = 1; i < 10; i++)
                 {
                     count[i] += count[i - 1];
+                    OperationCount += 2;
                 }
 
-                for (i = Count - 1; i >= 0; i--)
+                for (int i = Count - 1; i >= 0; i--)
                 {
                     output[count[(this[i] / exp) % 10] - 1] = this[i];
                     count[(this[i] / exp) % 10]--;
+                    OperationCount += 3;
                 }
 
-                for (i = 0; i < Count; i++)
+                for (int i = 0; i < Count; i++)
                 {
                     this[i] = output[i];
+                    OperationCount += 2;
                 }
+
+                OperationCount += 7;
             }
 
             public void Print()
