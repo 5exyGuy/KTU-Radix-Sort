@@ -206,16 +206,16 @@ namespace LAB01.App.Data_Structures
                     return -1;
                 }
 
-                Byte[] data = new Byte[12];
+                Byte[] data = new Byte[4];
                 Index++;
-                FileStream.Seek(Index * 4, SeekOrigin.Begin);
-                FileStream.Read(data, 0, 12);
+                FileStream.Seek(Index * 4 + 8, SeekOrigin.Begin);
+                FileStream.Read(data, 0, 4);
                 // Previous Node Data
-                PrevNode = BitConverter.ToInt32(data, 0);
+                PrevNode = CurrentNode;
                 // Current Node Data
-                CurrentNode = BitConverter.ToInt32(data, 4);
+                CurrentNode = NextNode;
                 // Next Node Data
-                NextNode = BitConverter.ToInt32(data, 8);
+                NextNode = BitConverter.ToInt32(data, 4);
 
                 OperationCount += 9;
 
@@ -230,16 +230,16 @@ namespace LAB01.App.Data_Structures
                     return -1;
                 }
 
-                Byte[] data = new Byte[12];
+                Byte[] data = new Byte[4];
                 Index--;
-                FileStream.Seek(Index * 4, SeekOrigin.Begin);
-                FileStream.Read(data, 0, 12);
+                FileStream.Seek(Index * 4 + 8, SeekOrigin.Begin);
+                FileStream.Read(data, 0, 4);
                 // Previous Node Data
                 PrevNode = BitConverter.ToInt32(data, 0);
                 // Current Node Data
-                CurrentNode = BitConverter.ToInt32(data, 4);
+                CurrentNode = PrevNode;
                 // Next Node Data
-                NextNode = BitConverter.ToInt32(data, 8);
+                NextNode = CurrentNode;
 
                 OperationCount += 9;
 

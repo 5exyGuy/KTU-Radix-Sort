@@ -22,7 +22,15 @@ namespace LAB01.App.Data_Structures
         {
             public int Count { get { return Array.Length; } }
             public int[] Array { private set; get; }
-            public int this[int i] { get { return Array[i]; } }
+            public int this[int i] { 
+                get {
+                    return Array[i];
+                } 
+                set
+                {
+                    Array[i] = value;
+                }
+            }
             public int OperationCount { private set; get; }
 
             public Memory() { }

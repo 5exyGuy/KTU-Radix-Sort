@@ -48,6 +48,7 @@
     <Compile Include="App\DataStructures\Container.cs" />
     <Compile Include="App\Enviroment.cs" />
     <Compile Include="App\Main.cs" />
+    <Compile Include="App\Pair.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
