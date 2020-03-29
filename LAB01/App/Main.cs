@@ -280,7 +280,7 @@ namespace LAB01.App
 
         private void RunPerformanceTest()
         {
-            int[] size = new int[] { 100, 200, 400, 800, 1600 };
+            int[] size = new int[] { 500, 1000, 2000, 4000, 8000, 16000, 32000 };
             Stopwatch stopwatch = new Stopwatch();
             TimeSpan timeM, timeD;
 
@@ -292,13 +292,13 @@ namespace LAB01.App
 
             for (int i = 0; i < size.Length; i++)
             {
+                Container.MemoryEnv.ResetOperationCount();
+                Container.DiskEnv.ResetOperationCount();
+
                 /* Laikas (M) */
                 Container.MemoryEnv.Generate(size[i]);
                 stopwatch.Start();
-                using (Container.DiskEnv.FileStream = new FileStream(FileName, FileMode.Open, FileAccess.ReadWrite))
-                {
-                    Container.MemoryEnv.RadixSort();
-                }
+                Container.MemoryEnv.RadixSort();
                 timeM = stopwatch.Elapsed;
                 stopwatch.Reset();
                 /* Laikas (D) */
@@ -312,8 +312,6 @@ namespace LAB01.App
                 stopwatch.Reset();
 
                 arrayTable.AddRow(size[i], timeM, timeD, Container.MemoryEnv.OperationCount, Container.DiskEnv.OperationCount);
-                Container.MemoryEnv.ResetOperationCount();
-                Container.DiskEnv.ResetOperationCount();
             }
 
             arrayTable.Write(Format.Alternative);
@@ -326,13 +324,13 @@ namespace LAB01.App
 
             for (int i = 0; i < size.Length; i++)
             {
+                LinkedList.MemoryEnv.ResetOperationCount();
+                LinkedList.DiskEnv.ResetOperationCount();
+
                 /* Laikas (M) */
                 LinkedList.MemoryEnv.Generate(size[i]);
                 stopwatch.Start();
-                using (LinkedList.DiskEnv.FileStream = new FileStream(FileName, FileMode.Open, FileAccess.ReadWrite))
-                {
-                    LinkedList.MemoryEnv.RadixSort();
-                }
+                LinkedList.MemoryEnv.RadixSort();
                 timeM = stopwatch.Elapsed;
                 stopwatch.Reset();
                 /* Laikas (D) */
@@ -346,8 +344,6 @@ namespace LAB01.App
                 stopwatch.Reset();
 
                 listTable.AddRow(size[i], timeM, timeD, LinkedList.MemoryEnv.OperationCount, LinkedList.DiskEnv.OperationCount);
-                LinkedList.MemoryEnv.ResetOperationCount();
-                LinkedList.DiskEnv.ResetOperationCount();
             }
 
             listTable.Write(Format.Alternative);

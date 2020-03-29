@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LAB01.App.Data_Structures
 {
@@ -34,7 +30,7 @@ namespace LAB01.App.Data_Structures
 
             public void Generate(int n)
             {
-                Random random = new Random(2019);
+                Random random = new Random(2020);
                 for (int i = 0; i < n; i++)
                 {
                     Append(random.Next(Int32.MaxValue));
@@ -164,36 +160,44 @@ namespace LAB01.App.Data_Structures
 
             public int Head()
             {
-                Byte[] data = new Byte[12];
+                Byte[] data = new Byte[4];
                 Index = 0;
-                FileStream.Seek(Index, SeekOrigin.Begin);
-                FileStream.Read(data, 0, 12);
                 // Previous Node Data
+                FileStream.Seek(Index, SeekOrigin.Begin);
+                FileStream.Read(data, 0, 4);
                 PrevNode = BitConverter.ToInt32(data, 0);
                 // Current Node Data
-                CurrentNode = BitConverter.ToInt32(data, 4);
+                FileStream.Seek(Index + 4, SeekOrigin.Begin);
+                FileStream.Read(data, 0, 4);
+                CurrentNode = BitConverter.ToInt32(data, 0);
                 // Next Node Data
-                NextNode = BitConverter.ToInt32(data, 8);
+                FileStream.Seek(Index + 8, SeekOrigin.Begin);
+                FileStream.Read(data, 0, 4);
+                NextNode = BitConverter.ToInt32(data, 0);
 
-                OperationCount += 8;
-                
+                OperationCount += 12;
+
                 return CurrentNode;
             }
 
             private int Tail()
             {
-                Byte[] data = new Byte[12];
-                Index = Count - 1;
-                FileStream.Seek(Index * 4, SeekOrigin.Begin);
-                FileStream.Read(data, 0, 12);
+                Byte[] data = new Byte[4];
+                Index = (Count - 1);
                 // Previous Node Data
+                FileStream.Seek(Index * 4, SeekOrigin.Begin);
+                FileStream.Read(data, 0, 4);
                 PrevNode = BitConverter.ToInt32(data, 0);
                 // Current Node Data
-                CurrentNode = BitConverter.ToInt32(data, 4);
+                FileStream.Seek(Index * 4 + 4, SeekOrigin.Begin);
+                FileStream.Read(data, 0, 4);
+                CurrentNode = BitConverter.ToInt32(data, 0);
                 // Next Node Data 
-                NextNode = BitConverter.ToInt32(data, 8);
+                FileStream.Seek(Index * 4 + 8, SeekOrigin.Begin);
+                FileStream.Read(data, 0, 4);
+                NextNode = BitConverter.ToInt32(data, 0);
 
-                OperationCount += 8;
+                OperationCount += 12;
 
                 return CurrentNode;
             }
@@ -202,22 +206,26 @@ namespace LAB01.App.Data_Structures
             {
                 if (NextNode == -1)
                 {
-                    OperationCount += 1;
+                    OperationCount++;
                     return -1;
                 }
 
                 Byte[] data = new Byte[4];
                 Index++;
+                // Previous Node Data
+                FileStream.Seek(Index * 4, SeekOrigin.Begin);
+                FileStream.Read(data, 0, 4);
+                PrevNode = BitConverter.ToInt32(data, 0);
+                // Current Node Data
+                FileStream.Seek(Index * 4 + 4, SeekOrigin.Begin);
+                FileStream.Read(data, 0, 4);
+                CurrentNode = BitConverter.ToInt32(data, 0);
+                // Next Node Data
                 FileStream.Seek(Index * 4 + 8, SeekOrigin.Begin);
                 FileStream.Read(data, 0, 4);
-                // Previous Node Data
-                PrevNode = CurrentNode;
-                // Current Node Data
-                CurrentNode = NextNode;
-                // Next Node Data
-                NextNode = BitConverter.ToInt32(data, 4);
+                NextNode = BitConverter.ToInt32(data, 0);
 
-                OperationCount += 9;
+                OperationCount += 13;
 
                 return CurrentNode;
             }
@@ -232,16 +240,20 @@ namespace LAB01.App.Data_Structures
 
                 Byte[] data = new Byte[4];
                 Index--;
-                FileStream.Seek(Index * 4 + 8, SeekOrigin.Begin);
-                FileStream.Read(data, 0, 4);
                 // Previous Node Data
+                FileStream.Seek(Index * 4, SeekOrigin.Begin);
+                FileStream.Read(data, 0, 4);
                 PrevNode = BitConverter.ToInt32(data, 0);
                 // Current Node Data
-                CurrentNode = PrevNode;
+                FileStream.Seek(Index * 4 + 4, SeekOrigin.Begin);
+                FileStream.Read(data, 0, 4);
+                CurrentNode = BitConverter.ToInt32(data, 0);
                 // Next Node Data
-                NextNode = CurrentNode;
+                FileStream.Seek(Index * 4 + 8, SeekOrigin.Begin);
+                FileStream.Read(data, 0, 4);
+                NextNode = BitConverter.ToInt32(data, 0);
 
-                OperationCount += 9;
+                OperationCount += 13;
 
                 return CurrentNode;
             }
@@ -258,9 +270,9 @@ namespace LAB01.App.Data_Structures
 
             public void Generate(int n)
             {
-                Count = 0;
+                Count = n;
 
-                Random random = new Random(2019);
+                Random random = new Random(2020);
 
                 if (File.Exists(FileName)) File.Delete(FileName);
 
@@ -269,11 +281,9 @@ namespace LAB01.App.Data_Structures
                     using (BinaryWriter writer = new BinaryWriter(File.Open(FileName, FileMode.Create)))
                     {
                         writer.Write(-1);
-                        for (int i = 0; i < n; i++)
+                        for (int i = 0; i < Count; i++)
                         {
-                            int test = random.Next(Int32.MaxValue);
-                            writer.Write(test);
-                            Count++;
+                            writer.Write(random.Next(Int32.MaxValue));
                         }
                         writer.Write(-1);
                     }
@@ -301,11 +311,11 @@ namespace LAB01.App.Data_Structures
             {
                 int mx = Head();
 
-                for (int i = 0; i < Count; i++)
+                for (int res = Next(); res != -1; res = Next())
                 {
-                    if (Next() > mx)
+                    if (res > mx)
                     {
-                        mx = CurrentNode;
+                        mx = res;
                         OperationCount++;
                     }
 
@@ -320,21 +330,22 @@ namespace LAB01.App.Data_Structures
             private void CountSort(int exp)
             {
                 int[] output = new int[Count];
+                int i;
                 int[] count = new int[10];
 
-                for (int i = 0; i < 10; i++)
+                for (i = 0; i < 10; i++)
                 {
                     count[i] = 0;
                     OperationCount += 2;
                 }
 
-                for (int res = Head(); res != -1 ; res = Next())
+                for (int res = Head(); res != -1; res = Next())
                 {
                     count[(res / exp) % 10]++;
                     OperationCount += 2;
                 }
 
-                for (int i = 1; i < 10; i++)
+                for (i = 1; i < 10; i++)
                 {
                     count[i] += count[i - 1];
                     OperationCount += 2;
@@ -358,11 +369,9 @@ namespace LAB01.App.Data_Structures
 
             public void Print()
             {
-                Head();
-                for (int i = 0; i < Count; i++)
+                for (int res = Head(); res != -1; res = Next())
                 {
-                    Console.WriteLine(CurrentNode);
-                    Next();
+                    Console.WriteLine(res);
                 }
             }
         }

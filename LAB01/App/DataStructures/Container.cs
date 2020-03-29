@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LAB01.App.Data_Structures
 {
@@ -20,7 +16,7 @@ namespace LAB01.App.Data_Structures
 
         public class Memory
         {
-            public int Count { get { return Array.Length; } }
+            public int Count { private set; get; }
             public int[] Array { private set; get; }
             public int this[int i] { 
                 get {
@@ -42,12 +38,13 @@ namespace LAB01.App.Data_Structures
 
             public void Generate(int n)
             {
-                Array = new int[n];
+                Count = n;
+                Array = new int[Count];
 
-                Random random = new Random(2019);
-                for (int i = 0; i < n; i++)
+                Random random = new Random(2020);
+                for (int i = 0; i < Count; i++)
                 {
-                    Array[i] = random.Next(Int32.MaxValue);
+                    this[i] = random.Next(Int32.MaxValue);
                 }
             }
 
@@ -66,13 +63,13 @@ namespace LAB01.App.Data_Structures
 
             private int GetMax()
             {
-                int mx = Array[0];
+                int mx = this[0];
 
                 for (int i = 1; i < Count; i++)
                 {
-                    if (Array[i] > mx)
+                    if (this[i] > mx)
                     {
-                        mx = Array[i];
+                        mx = this[i];
                         OperationCount++;
                     }
 
@@ -97,7 +94,7 @@ namespace LAB01.App.Data_Structures
 
                 for (int i = 0; i < Count; i++)
                 {
-                    count[(Array[i] / exp) % 10]++;
+                    count[(this[i] / exp) % 10]++;
                     OperationCount += 2;
                 }
 
@@ -109,14 +106,14 @@ namespace LAB01.App.Data_Structures
 
                 for (int i = Count - 1; i >= 0; i--)
                 {
-                    output[count[(Array[i] / exp) % 10] - 1] = Array[i];
-                    count[(Array[i] / exp) % 10]--;
+                    output[count[(this[i] / exp) % 10] - 1] = this[i];
+                    count[(this[i] / exp) % 10]--;
                     OperationCount += 3;
                 }
 
                 for (int i = 0; i < Count; i++)
                 {
-                    Array[i] = output[i];
+                    this[i] = output[i];
                     OperationCount += 2;
                 }
 
@@ -127,7 +124,7 @@ namespace LAB01.App.Data_Structures
             {
                 for (int i = 0; i < Count; i++)
                 {
-                    Console.WriteLine($"{Array[i]} ");
+                    Console.WriteLine($"{this[i]} ");
                 }
             }
         }
@@ -171,9 +168,9 @@ namespace LAB01.App.Data_Structures
 
             public void Generate(int n)
             {
-                Count = 0;
+                Count = n;
 
-                Random random = new Random(2019);
+                Random random = new Random(2020);
 
                 if (File.Exists(FileName)) File.Delete(FileName);
 
@@ -181,10 +178,9 @@ namespace LAB01.App.Data_Structures
                 {
                     using (BinaryWriter writer = new BinaryWriter(File.Open(FileName, FileMode.Create)))
                     {
-                        for (int i = 0; i < n; i++)
+                        for (int i = 0; i < Count; i++)
                         {
                             writer.Write(random.Next(Int32.MaxValue));
-                            Count++;
                         }
                     }
                 }
